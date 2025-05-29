@@ -153,3 +153,15 @@ aside nav a.bg-\[var\(--tsar-accent\)\].text-black:hover {
   }
 }
 
+.veille-summary p {
+  border-bottom: 1px solid var(--tsar-accent);
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+}
+.veille-summary p:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+

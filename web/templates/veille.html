@@ -1,26 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-4xl mx-auto text-center">
-  <h1 class="text-3xl font-bold mb-6">Veille Cyber</h1>
+<div class="max-w-5xl mx-auto py-12 space-y-12">
+  <h1 class="text-5xl font-bold text-center mb-10">Veille Cyber</h1>
+
   {% if entries %}
-    <ul class="space-y-6">
-      {% for entry in entries %}
-      <li class="bg-translucent p-6 rounded-lg shadow-inner text-left mx-auto max-w-3xl">
-        <a href="{{ entry.link }}" target="_blank"
-           class="text-xl font-semibold hover:underline text-[var(--tsar-accent)]">
-          {{ entry.title }}
-        </a>
+    {% for entry in entries[:50] %}
+    {% set img = entry.media_content[0]['url'] if entry.media_content else (entry.enclosures[0]['href'] if entry.enclosures else None) %}
+    <article class="bg-[var(--tsar-card)] border-l-8 border-[var(--tsar-accent)] rounded-3xl shadow-2xl overflow-hidden transition-transform hover:scale-[1.02] duration-300">
+      {% if img %}
+      <div class="w-full h-80 overflow-hidden">
+        <img src="{{ img }}" alt="{{ entry.title }}" class="w-full h-full object-cover">
+      </div>
+      {% endif %}
+      <div class="p-10 space-y-6">
+        <h2 class="text-3xl font-bold text-[var(--tsar-accent)]">{{ entry.title }}</h2>
         {% if entry.published %}
-          <p class="text-gray-400 text-sm">Publié le {{ entry.published }}</p>
+        <p class="text-gray-500 italic text-sm">Publié le {{ entry.published }}</p>
         {% endif %}
-        {% if entry.summary %}
-          <p class="mt-2 text-gray-200 text-sm">{{ entry.summary|safe }}</p>
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
+        <div class="text-gray-200 text-lg leading-relaxed whitespace-pre-line">
+          {{ entry.summary|safe }}
+        </div>
+        <div class="text-gray-400 text-sm">{{ entry.source.title if entry.source else '' }}</div>
+      </div>
+    </article>
+    {% endfor %}
   {% else %}
-    <p class="text-gray-400">Aucun article trouvé.</p>
+    <p class="text-center text-gray-400">Aucun article trouvé.</p>
   {% endif %}
 </div>
 {% endblock %}
