@@ -12,7 +12,8 @@
 
           <div class="flex items-center justify-between mt-4">
             <a href="{{ url_for('routes.module_live', name=m.name) }}"
-               class="inline-block px-6 py-3 bg-[var(--tsar-accent)] border-2 border-[var(--tsar-accent)] rounded-lg font-semibold text-black text-center shadow-md hover:bg-[var(--tsar-accent2)] hover:border-[var(--tsar-accent2)]">
+               class="inline-block px-6 py-3 bg-[var(--tsar-accent)] text-black rounded-lg font-semibold border-2 border-[var(--tsar-accent)] transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg hover:text-white text-center"
+            >
               Lancer
             </a>
             <button hx-post="{{ url_for('routes.toggle_favorite', name=m.name) }}"
@@ -30,3 +31,4 @@
   {% endif %}
 </div>
 {% endblock %}
+

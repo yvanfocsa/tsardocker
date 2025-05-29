@@ -143,3 +143,13 @@ aside nav a.bg-\[var\(--tsar-accent\)\].text-black:hover {
 }background-color: rgba(255, 102, 102, 0.1); /* var(--tsar-accent2) à 10% */
 }
 
+@layer components {
+  /* Animation hover pour tous les boutons */
+  .btn-anim {
+    @apply transform transition duration-300 ease-in-out;
+  }
+  .btn-anim:hover {
+    @apply scale-105 shadow-lg;
+  }
+}
+
