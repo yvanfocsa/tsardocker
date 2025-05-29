@@ -1,4 +1,3 @@
-{# web/templates/dashboard.html #}
 {% extends "base.html" %}
 {% block content %}
 
@@ -32,10 +31,7 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for m in favoris %}
     <a href="{{ url_for('routes.module_live', name=m.name) }}"
-       class="block bg-translucent 
-              p-5 rounded-lg shadow-inner
-              transition-colors transition-shadow duration-200
-              hover:bg-[rgba(30,30,30,0.8)] hover:shadow-lg"
+       class="fav-card block bg-translucent p-5 rounded-lg shadow-inner"
     >
       <h3 class="font-semibold text-lg text-[var(--tsar-text)]">{{ m.name }}</h3>
       <p class="text-gray-400 text-sm mt-1">{{ m.description }}</p>

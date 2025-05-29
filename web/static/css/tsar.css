@@ -80,7 +80,7 @@ a:hover { color: var(--tsar-accent2); }
 
 /* ===== FOND TRANSLUCIDE + FLOU ===== */
 .bg-translucent {
-  background-color: rgba(30, 30, 30, 0.6) !important;
+  background-color: rgba(30, 30, 30, 0.6);
   backdrop-filter: blur(8px);
 }
 
@@ -128,3 +128,18 @@ aside nav a.bg-\[var\(--tsar-accent\)\].text-black:hover {
   align-items: center;
   margin-top: 1rem;
 }
+
+@layer components {
+  /* ===== FAVORIS CARDS HOVER EFFECT ===== */
+  .fav-card {
+    @apply transform transition duration-300 ease-in-out;
+  }
+
+  .fav-card:hover {
+    @apply scale-105 shadow-lg;
+    /* override du !important de bg-translucent */
+    background-color: rgba(255, 102, 102, 0.1) !important; /* var(--tsar-accent2) à 10% */
+  }
+}background-color: rgba(255, 102, 102, 0.1); /* var(--tsar-accent2) à 10% */
+}
+
