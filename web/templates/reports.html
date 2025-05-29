@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card p-6 rounded-lg shadow">
+  <h2 class="text-2xl font-semibold mb-4">Mes rapports</h2>
+
+  {% if reports %}
+  <table class="min-w-full text-gray-300">
+    <thead class="text-gray-400 text-xs uppercase">
+      <tr>
+        <th class="px-4 py-2 text-left">ID</th>
+        <th class="px-4 py-2 text-left">Fichier</th>
+        <th class="px-4 py-2 text-left">Date</th>
+        <th class="px-4 py-2"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reports %}
+      <tr class="border-t border-[#21262d] hover:bg-[#1d2530]">
+        <td class="px-4 py-2">{{ r.id }}</td>
+        <td class="px-4 py-2">{{ r.filename }}</td>
+        <td class="px-4 py-2">{{ r.created_at }}</td>
+        <td class="px-4 py-2 text-right">
+          <a href="{{ url_for('routes.download_report', rid=r.id) }}"
+             class="text-[var(--tsar-accent)] hover:underline">
+            Télécharger
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p class="text-gray-400">Aucun rapport pour le moment.</p>
+  {% endif %}
+</div>
+
+{% endblock %}
+

@@ -1,0 +1,83 @@
+# docker-compose.yaml  – stack « TSAR »
+
+services:
+  # ─────────── TOOLBOX (Kali headless) ───────────
+  toolbox:
+    build:
+      context: ./toolbox
+      dockerfile: Dockerfile
+    image: tsar/toolbox:light
+    command: tail -f /dev/null         # reste vivant
+    labels:
+      - "traefik.enable=false"         # pas routé par Traefik
+    networks: [tsar-net]
+
+  # ─────────── POSTGRES ───────────
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER:-tsar}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tsarpass}
+      POSTGRES_DB:       ${POSTGRES_DB:-tsar}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks: [tsar-net]
+
+  # ─────────── FLASK WEB ───────────
+  web:
+    build:
+      context: .              # inclut /modules
+      dockerfile: web/Dockerfile
+    image: tsar/web:latest
+    env_file: .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # exec inside toolbox
+    depends_on:
+      db:
+        condition: service_healthy
+      toolbox:
+        condition: service_started
+    ports:
+      - "5373:5373"
+    networks: [tsar-net]
+
+  # ─────────── TRAEFIK (reverse-proxy) ───────────
+  traefik:
+    image: traefik:v3.0
+    command:
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # ACME – Let’s Encrypt
+      - "--certificatesresolvers.le.acme.httpchallenge=true"
+      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.le.acme.email=${TRAEFIK_EMAIL}"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik-data:/letsencrypt
+    depends_on:
+      - web
+    networks: [tsar-net]
+    labels:
+      - "traefik.http.routers.tsar.rule=Host(`${TSAR_DOMAIN}`)"
+      - "traefik.http.routers.tsar.entrypoints=websecure"
+      - "traefik.http.routers.tsar.tls.certresolver=le"
+      - "traefik.http.services.tsar.loadbalancer.server.port=5000"
+
+# ─────────── RÉSEAUX & VOLUMES ───────────
+networks:
+  tsar-net:
+
+volumes:
+  db-data:
+  traefik-data:
+
