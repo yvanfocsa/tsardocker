@@ -53,6 +53,11 @@
            class="block px-4 py-2 rounded-lg {{ 'bg-[var(--tsar-accent)] text-black' if '/reports' in request.path else 'hover:bg-[#1d2530]' }}">
           Rapports
         </a>
+        <!-- Veille RSS -->
+        <a href="{{ url_for('routes.veille') }}"
+           class="block px-4 py-2 rounded-lg {{ 'bg-[var(--tsar-accent)] text-black' if '/veille' in request.path else 'hover:bg-[#1d2530]' }}">
+          Veille
+        </a>
       </nav>
 
       <!-- Bas : pseudo + emoji utilisateur -->
@@ -86,3 +91,4 @@
   </script>
 </body>
 </html>
+

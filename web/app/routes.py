@@ -9,6 +9,7 @@ from io import BytesIO
 import docker
 import psutil
 import requests
+import feedparser
 from flask import (
     Blueprint, Response, abort, current_app, jsonify, redirect,
     render_template, request, send_file, session, stream_with_context,
@@ -260,3 +261,17 @@ def download_report(rid: int):
         download_name=rep.filename,
         mimetype="application/pdf",
     )
+
+
+# ─────────── FLUX RSS VEILLE ───────────
+@bp.route("/veille")
+@login_required
+def veille():
+    """
+    Affiche les dernières actualités du flux RSS Cyber Veille
+    """
+    rss_url = "https://cyberveille.curated.co/issues.rss"
+    feed = feedparser.parse(rss_url)
+    entries = feed.entries[:20]  # Limite aux 20 derniers articles
+    return render_template("veille.html", entries=entries)
+
