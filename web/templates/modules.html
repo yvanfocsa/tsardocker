@@ -3,31 +3,41 @@
 {% block content %}
 <div class="container mx-auto px-6 py-12">
   {% if cats %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-12 justify-items-center">
-      {% for category, mods in cats.items() %}
-        {% set m = mods[0] %}
-        <div class="max-w-md w-full bg-translucent p-8 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-200">
-          <h3 class="text-2xl font-bold text-[var(--tsar-text)] mb-3">{{ category }}</h3>
-          <p class="text-gray-400 text-sm mb-6 leading-relaxed">{{ m.description }}</p>
+    {% for category, mods in cats.items() %}
+      <h2 class="text-3xl font-bold text-[var(--tsar-text)] mb-6">{{ category }}</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        {% for m in mods %}
+        <div class="bg-translucent p-6 rounded-lg shadow-md flex flex-col justify-between hover:shadow-xl transition">
+          <div>
+            <h3 class="text-2xl font-semibold mb-2 text-[var(--tsar-text)]">{{ m.name }}</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">{{ m.description }}</p>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            {# Choix du lien selon le module #}
+            {% if m.name == 'Rapport – Génération' or m.name == 'CVE Analysis – IA' %}
+              <a href="{{ url_for('routes.module_form', name=m.name) }}"
+                 class="inline-block px-6 py-2 bg-[var(--tsar-accent)] text-black font-medium rounded-lg hover:bg-[var(--tsar-accent2)] transition whitespace-nowrap">
+                {% if m.name == 'Rapport – Génération' %}Générer Rapport{% else %}Lancer Analyse{% endif %}
+              </a>
+            {% else %}
+              <a href="{{ url_for('routes.module_live', name=m.name) }}"
+                 class="inline-block px-6 py-2 bg-[var(--tsar-accent)] text-black font-medium rounded-lg hover:bg-[var(--tsar-accent2)] transition">
+                Lancer
+              </a>
+            {% endif %}
 
-          <div class="flex items-center justify-between mt-4">
-            <a href="{{ url_for('routes.module_live', name=m.name) }}"
-               class="inline-block px-6 py-3 bg-[var(--tsar-accent)] text-black rounded-lg font-semibold border-2 border-[var(--tsar-accent)] transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg hover:text-white text-center"
-            >
-              Lancer
-            </a>
             <button hx-post="{{ url_for('routes.toggle_favorite', name=m.name) }}"
                     hx-swap="outerHTML"
-                    class="fav-btn {% if m.name in session.get('favorites', []) %}filled{% else %}outline{% endif %} focus:outline-none focus:ring-0"
-                    title="Ajouter/retirer des favoris">
+                    class="fav-btn {% if m.name in session.get('favorites', []) %}filled{% else %}outline{% endif %}" title="Ajouter/retirer des favoris">
               {% if m.name in session.get('favorites', []) %}★{% else %}☆{% endif %}
             </button>
           </div>
         </div>
-      {% endfor %}
-    </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
   {% else %}
-    <p class="text-gray-400 text-center">Aucun module trouvé.</p>
+    <p class="text-gray-400 text-center">Aucun module disponible.</p>
   {% endif %}
 </div>
 {% endblock %}
