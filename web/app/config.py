@@ -1,4 +1,3 @@
-
 import os
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev")
@@ -13,3 +12,4 @@ class Config:
     POSTGRES_DB = os.environ.get("POSTGRES_DB", "tsar")
     SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@db:5432/{POSTGRES_DB}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+

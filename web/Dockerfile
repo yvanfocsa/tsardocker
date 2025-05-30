@@ -10,7 +10,8 @@ RUN apt-get update && \
 
 # 2. Déps Python
 COPY web/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir transformers torch
 
 # 3. Code
 COPY web/ /app
