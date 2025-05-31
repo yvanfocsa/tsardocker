@@ -1,39 +1,38 @@
 {% extends "base.html" %}
+
 {% block content %}
-
-<div class="card p-6 rounded-lg shadow">
-  <h2 class="text-2xl font-semibold mb-4">Mes rapports</h2>
-
+<div class="max-w-5xl mx-auto py-12">
+  <h2 class="text-3xl font-bold mb-6 text-[var(--tsar-accent)]">Mes Rapports</h2>
   {% if reports %}
-  <table class="min-w-full text-gray-300">
-    <thead class="text-gray-400 text-xs uppercase">
-      <tr>
-        <th class="px-4 py-2 text-left">ID</th>
-        <th class="px-4 py-2 text-left">Fichier</th>
-        <th class="px-4 py-2 text-left">Date</th>
-        <th class="px-4 py-2"></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for r in reports %}
-      <tr class="border-t border-[#21262d] hover:bg-[#1d2530]">
-        <td class="px-4 py-2">{{ r.id }}</td>
-        <td class="px-4 py-2">{{ r.filename }}</td>
-        <td class="px-4 py-2">{{ r.created_at }}</td>
-        <td class="px-4 py-2 text-right">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    {% for r in reports %}
+    <div class="bg-translucent p-6 rounded-2xl shadow-lg hover:shadow-2xl transition">
+      <div class="flex flex-col h-full justify-between">
+        <div>
+          <h3 class="text-xl font-semibold text-[var(--tsar-text)] mb-2">{{ r.filename }}</h3>
+          <p class="text-gray-400 text-sm">Généré le {{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        </div>
+        <div class="mt-4 flex justify-end">
           <a href="{{ url_for('routes.download_report', rid=r.id) }}"
-             class="text-[var(--tsar-accent)] hover:underline">
+             class="inline-flex items-center gap-2 px-4 py-2 bg-[var(--tsar-accent)] text-black font-medium rounded-lg hover:bg-[var(--tsar-accent2)] transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12v8m0-8l-4 4m4-4l4 4M12 4v8" />
+            </svg>
             Télécharger
           </a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
   {% else %}
-    <p class="text-gray-400">Aucun rapport pour le moment.</p>
+  <div class="bg-translucent p-8 rounded-2xl shadow-inner text-center">
+    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m4 0v-2a4 4 0 00-3-3.87M5 17v-2a4 4 0 013-3.87" />
+    </svg>
+    <p class="text-gray-400">Vous n'avez aucun rapport pour le moment.<br>Cliquez sur "Modules > Rapport – Génération" pour en créer un.</p>
+  </div>
   {% endif %}
 </div>
-
 {% endblock %}
 

@@ -196,17 +196,48 @@ def module_form(name: str):
     mod = next((m for m in MODULES if m["name"] == name), None)
     if not mod:
         abort(404)
+
+    if mod["name"] == "Rapport – Génération":
+        targets = (
+            ScanLog.query
+            .filter_by(user_sub=current_user.sub)
+            .filter(ScanLog.target.isnot(None))
+            .with_entities(ScanLog.target)
+            .distinct()
+            .all()
+        )
+        target_list = [t[0] for t in targets]
+        return render_template("module_form.html", mod=mod, target_list=target_list)
+
     return render_template("module_form.html", mod=mod)
 
+# ─────────── EXECUTE MODULE / GENERATE PDF ───────────
 @bp.route("/modules/<name>/run", methods=["POST"])
 @login_required
 def module_run(name: str):
     mod = next((m for m in MODULES if m["name"] == name), None)
     if not mod:
-        return jsonify({"error": "module not found"}), 404
-    params = {f["name"]: request.form.get(f["name"], "") for f in mod["schema"]}
+        abort(404)
+
+    # Récupération des paramètres
+    if request.is_json:
+        params = request.get_json() or {}
+    else:
+        params = {}
+        for field in mod.get("schema", []):
+            if field["type"] == "multiselect":
+                params[field["name"]] = request.form.getlist(field["name"])
+            else:
+                params[field["name"]] = request.form.get(field["name"], "")
+
+    # Exécution du module
     job_id = run_job(mod, params, current_user.sub)
-    return jsonify({"job_id": job_id})
+
+    # AJAX ou redirection
+    is_ajax = request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest"
+    if is_ajax:
+        return jsonify({"job_id": job_id})
+    return redirect(url_for("routes.reports"))
 
 # ─────────── PDF REPORTS ───────────
 @bp.route("/reports")
@@ -243,7 +274,7 @@ def veille():
     entries = feed.entries[:20]
     return render_template("veille.html", entries=entries)
 
-# Dans create_app() (web/app/__init__.py), n’oublie pas :
-#   app.register_blueprint(bp)
-#   app.register_blueprint(bp_cve)
+# register blueprints dans create_app
+# app.register_blueprint(bp)
+# app.register_blueprint(bp_cve)
 

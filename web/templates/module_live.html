@@ -1,75 +1,54 @@
-{# web/templates/module_live.html #}
 {% extends "base.html" %}
+
 {% block content %}
 <div class="max-w-screen-lg mx-auto space-y-6">
 
   <h1 class="text-3xl font-bold">{{ mod.name }} – Exécuter</h1>
 
-  <!-- ─── Cible + sélecteur de mode + bouton ─── -->
+  <!-- Cible + mode + bouton -->
   <div class="flex gap-4">
-    <input id="targetInput"
-           type="text"
-           placeholder="Cible (IP / domaine)"
-           class="flex-1 px-4 py-2 rounded bg-[#111] border border-[#333]
-                  focus:outline-none focus:ring-2 focus:ring-[var(--tsar-accent)]" />
-
-    <select id="modeSelect"
-            class="px-3 py-2 rounded bg-[#111] border border-[#333] text-sm">
+    <input id="targetInput" type="text" placeholder="Cible (IP / domaine)"
+           class="flex-1 px-4 py-2 rounded bg-[#111] border border-[#333] focus:ring-[var(--tsar-accent)]" />
+    <select id="modeSelect" class="px-3 py-2 rounded bg-[#111] border border-[#333] text-sm">
       <option value="quick" selected>Rapide</option>
       <option value="full">Complet</option>
     </select>
-
-    <button id="runBtn"
-            class="bg-[var(--tsar-accent)] text-black px-6 py-2 rounded hover:opacity-80">
-      Exécuter
-    </button>
+    <button id="runBtn" class="bg-[var(--tsar-accent)] text-black px-6 py-2 rounded hover:opacity-80">Exécuter</button>
   </div>
 
   <!-- Terminal -->
   <div class="terminal-wrapper bg-translucent rounded-lg shadow-lg overflow-hidden border border-[#333]">
-    <pre id="terminal"
-         class="terminal-output scrollbar-thin bg-black text-green-400
-                px-4 py-3 h-[460px] overflow-auto leading-relaxed"></pre>
+    <pre id="terminal" class="terminal-output scrollbar-thin bg-black text-green-400 px-4 py-3 h-[460px] overflow-auto leading-relaxed"></pre>
   </div>
 
 </div>
 
 <script>
-/* -------- Terminal live (SSE) -------- */
-const btn    = document.getElementById('runBtn');
-const term   = document.getElementById('terminal');
-const inp    = document.getElementById('targetInput');
-const mode   = document.getElementById('modeSelect');
-let stream   = null;
+// Terminal live (SSE)
+const btn = document.getElementById('runBtn');
+const term = document.getElementById('terminal');
+const inp = document.getElementById('targetInput');
+const mode = document.getElementById('modeSelect');
+// Encode URL properly
+const streamBase = {{ url_for('routes.module_stream', name=mod.name) | tojson }};
+let stream;
 
-btn.onclick = () => {
-  // Prépare les paramètres target + mode
-  const q = new URLSearchParams({
-    target: inp.value.trim(),
-    mode:   mode.value
-  }).toString();
-
-  btn.disabled     = true;
-  term.textContent = '';  // réinitialise sans doublons
-
-  // Coupe un flux précédent s’il existe
+btn.addEventListener('click', () => {
+  const q = new URLSearchParams({ target: inp.value.trim(), mode: mode.value }).toString();
+  btn.disabled = true;
+  term.textContent = '';
   if (stream) stream.close();
-
-  // Ouvre le nouveau flux SSE
-  stream = new EventSource(`{{ url_for('routes.module_stream', name=mod.name) }}?${q}`);
-
+  stream = new EventSource(`${streamBase}?${q}`);
   stream.onmessage = e => {
-    term.textContent += e.data + "\n";
-    // Scroll auto
+    term.textContent += e.data + '\n';
     term.parentElement.scrollTop = term.parentElement.scrollHeight;
   };
-
   stream.onerror = () => {
-    term.textContent += "\n✖ Fin du flux.\n";
+    term.textContent += '\n✖ Fin du flux.\n';
     btn.disabled = false;
     stream.close();
   };
-};
+});
 </script>
 {% endblock %}
 
